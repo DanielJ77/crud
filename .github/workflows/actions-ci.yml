@@ -48,8 +48,7 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=crud
-            -Dsonar.organization=my-github-org
+            -Dsonar.projectKey=test-deploy_crud
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.java.binaries=**/target/classes
