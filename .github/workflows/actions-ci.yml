@@ -59,9 +59,11 @@ jobs:
           ENV_DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Scan WAR file with Trivy
-        uses: aquasecurity/trivy-action@master
-        args: fs --ignore-unfixed --no-progress ./target/*.war
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@v1
+        with:
+        scan-type: 'fs'
+        args: '--ignore-unfixed --no-progress ./target/*.war'
 
 
 
