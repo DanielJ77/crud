@@ -2,15 +2,59 @@ name: GitHub Actions CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ secrets.ENV_DATABASE_URL }}
+          POSTGRES_USER: ${{ secrets.ENV_DATABASE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
+          ports:
+            - 5432:5432
+          options: >-
+            --health-cmd "pg_isready -U ${{ secrets.ENV_DATABASE_USER }}" 
+            --health-interval 10s 
+            --health-timeout 5s 
+            --health-retries 5
     steps:
-      - name:
+      - name: Checkout Code
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and Test
+        run: mvn clean install
+        env:
+          ENV_DATABASE_URL: ${{ secrets.ENV_DATABASE_URL }}
+          ENV_DATABASE_USER: ${{ secrets.ENV_DATABASE_USER }}
+          ENV_DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
+
+      - name: Static Code Analysis
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=crud
+            -Dsonar.organization=my-github-org
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.java.binaries=**/target/classes
+
+      - name: Security Vulnerabilities Scan
+        uses: anchore/scan-action@v2
+        with:
+          image-reference: target/*.war
