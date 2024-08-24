@@ -26,17 +26,6 @@ jobs:
             --health-timeout 5s 
             --health-retries 5
     steps:
-      - name: Debug
-        id: debug
-        uses: raven-actions/debug@v1
-        with:
-          smee: true  # optional, if not set then default is `false`
-          smee-channel: my-custom-channel-name # optional, if not set then default is `repositoryOwner-repositoryName`, e.g. raven-actions-debug
-
-      - name: Debug outputs
-        if: ${{ steps.debug.outputs.smee == 'true' }}  # example usage
-        run: |
-          echo "Your SMEE.io URL is: ${{ steps.debug.outputs.smee-url }}"
 
       - name: Checkout Code
       - uses: actions/checkout@v4
@@ -47,31 +36,28 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+
       - name: Cache Maven packages
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-  
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and Test
-        run: mvn clean install
+      - name: Build, test and analyze
+        run: mvn -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=test-deploy_crud
         env:
           ENV_DATABASE_URL: ${{ secrets.ENV_DATABASE_URL }}
           ENV_DATABASE_USER: ${{ secrets.ENV_DATABASE_USER }}
           ENV_DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
-
-      - name: Static Code Analysis
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=test-deploy_crud
-            -Dsonar.organization=test-deploy
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.java.binaries=**/target/classes
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Security Vulnerabilities Scan
         uses: anchore/scan-action@v2
