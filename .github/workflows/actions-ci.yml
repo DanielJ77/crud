@@ -60,7 +60,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Install Trivy
-        uses: aquasecurity/trivy-action@v1
+        uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: 'fs'
           args: '--ignore-unfixed --no-progress ./target/*.war'
