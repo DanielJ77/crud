@@ -44,7 +44,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -61,15 +61,18 @@ jobs:
       - name: Scan with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          scan-type: 'fs'
-          args: '--ignore-unfixed --no-progress ./target/*.war'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          scan-type: fs
+          args: --ignore-unfixed --no-progress ./target/*.war
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Debug SARIF file content
+        run: cat trivy-results.sarif
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: trivy-results.sarif
 
 
 
