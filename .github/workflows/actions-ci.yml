@@ -61,7 +61,7 @@ jobs:
 
       - name: Scan WAR file with Trivy
         uses: aquasecurity/trivy-action@master
-        run: trivy fs --ignore-unfixed --no-progress ./target/*.war
+        args: fs --ignore-unfixed --no-progress ./target/*.war
 
 
 
