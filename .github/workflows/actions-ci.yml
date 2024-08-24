@@ -26,6 +26,14 @@ jobs:
             --health-timeout 5s 
             --health-retries 5
     steps:
+      - name: Debug
+      - uses: raven-actions/debug@v1
+      - with:
+          vars-context: ${{ toJson(vars) }}  # optional
+          secrets-context: ${{ toJson(secrets) }}  # optional
+          needs-context: ${{ toJson(needs) }}  # optional
+          inputs-context: ${{ toJson(inputs) }}
+
       - name: Checkout Code
       - uses: actions/checkout@v4
 
