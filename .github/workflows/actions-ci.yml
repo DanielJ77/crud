@@ -53,7 +53,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build, test and analyze
-        run: mvn -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=test-deploy_crud -Dsonar.exclusions=**/test/**, **/tests/**, **/*Test.java, **/*Spec.java
+        run: mvn -B clean install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=test-deploy_crud
         env:
           ENV_DATABASE_URL: ${{ secrets.ENV_DATABASE_URL }}
           ENV_DATABASE_USER: ${{ secrets.ENV_DATABASE_USER }}

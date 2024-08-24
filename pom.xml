@@ -31,6 +31,9 @@
         <java.version>21</java.version>
         <sonar.organization>test-deploy</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar-project.properties>
+            sonar.exclusions=**/test/**, **/tests/**, **/*Test.java, **/*Spec.java
+        </sonar-project.properties>
     </properties>
     <dependencies>
 
