@@ -60,10 +60,13 @@ jobs:
           ENV_DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Build Docker Image
+        run: docker build -t my-image:latest .
+
       - name: Security Vulnerabilities Scan
         uses: anchore/scan-action@v2
         with:
-          image-reference: target/*.war
+          image: my-image:latest
 
 
 
