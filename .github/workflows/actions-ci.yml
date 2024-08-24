@@ -59,7 +59,7 @@ jobs:
           ENV_DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Install Trivy
+      - name: Scan with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: 'fs'
@@ -69,6 +69,9 @@ jobs:
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
+        permissions:
+          contents: read
+          security-events: write
         with:
           sarif_file: 'trivy-results.sarif'
 
